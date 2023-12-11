@@ -1,306 +1,125 @@
-import { DateTime } from 'luxon';
+import CustomBounce from './utils/CustomBounce';
 
-$(document).ready(() => {
-  // ----- HERO Animation
-  ScrollTrigger.matchMedia({
-    // Have the animation only on desktop
-    '(min-width: 992px)': function () {
-      // Hero Section
-      $('.hero-intro').each(function () {
-        let heroIntro = $(this);
-        let heroWrap = $(this).find('.hero-intro_wrap');
-        let videoBox = $(this).find('.header01_visual-box');
-        let tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: $(this),
-            start: 'top top',
-            end: 'center top',
-            scrub: 0.2,
-            markers: true,
-            invalidateOnRefresh: true,
-          },
-        });
+gsap.registerPlugin(CustomEase, CustomBounce);
 
-        // --- Set Section
-        let videoBoxHeight;
-        let videoBoxWidth;
+// Els
+let mainBox = $('.hp-hero_main-box');
+let avatar = $('.hp-hero_avatar');
 
-        function setSectionHeight() {
-          $(heroIntro).height(heroWrap.height() * 2);
-          videoBoxHeight = $('.header01_visual-split').height();
-          videoBoxWidth = $('.header01_visual-split').width();
-        }
+let boxes = $('.hp-hero_box');
+let order = [1, 4, 0, 3, 2];
+let orderedBoxes = $($.map(order, (index) => boxes[index]));
 
-        function setVideoWidth() {
-          let paddingGlobal = gsap.getProperty('.padding-global', 'padding-left') * 2;
-          return videoBoxWidth + paddingGlobal;
-        }
+// Vars
+let fastReveal = { keyframes: { '50%': { opacity: 1 } } };
+let boxDuration = 0.7;
+let boxStagger = 0.15;
+let hasMainBoxAnimated = false;
 
-        function calculateVideoMove() {
-          let topHeight = $(heroIntro).find('.section').eq(0).outerHeight();
-          topHeight *= -1;
-          console.log(topHeight);
-          return topHeight - 4;
-        }
-
-        // Load
-        setSectionHeight();
-
-        // Resize
-        $(window).resize(() => {
-          if ($(window).width() >= 992) {
-            setSectionHeight();
-            $(videoBox).width(() => {
-              return setVideoWidth();
-            });
-            $(videoBox).css({
-              transform: `translate(${() => {
-                return calculateVideoMove();
-              }})`,
-            });
-          } else {
-            $(heroIntro, videoBox).attr('style', '');
-          }
-        });
-
-        // --- Create the Animation
-        tl.fromTo(
-          videoBox,
-          {
-            height: '101svh',
-            width: () => {
-              return '101svw';
-            },
-            y: () => {
-              return calculateVideoMove();
-            },
-          },
-          {
-            height: () => {
-              return videoBoxHeight;
-            },
-            width: () => {
-              return videoBoxWidth;
-            },
-            y: 0,
-          }
-        );
-        tl.fromTo(
-          '.nav',
-          {
-            color: 'rgba(255, 255, 255, 1)',
-            borderColor: 'rgba(234, 236, 240, 0)',
-            backgroundColor: 'rgba(255, 255, 255, 0)',
-          },
-          {
-            keyframes: {
-              '30%': {
-                color: 'rgba(51, 58, 71, 1)',
-              },
-              '50%': {
-                borderColor: 'rgba(234, 236, 240, 1)',
-                backgroundColor: 'rgba(255, 255, 255, 1)',
-              },
-            },
-          },
-          '<'
-        );
-        tl.to(
-          '.header01_content',
-          {
-            keyframes: {
-              '25%': { opacity: 1 },
-              '50%': { opacity: 0 },
-            },
-          },
-          '<'
-        );
-        tl.fromTo(
-          '[hero-intro-move]',
-          {
-            y: '5rem',
-          },
-          {
-            y: '0',
-          },
-          '<'
-        );
-
-        // Project the Time and Date
-        var currentDate = new Date();
-
-        // Date
-        var month = currentDate.toLocaleString('en', { month: 'long' });
-        var day = currentDate.getDate();
-        var year = currentDate.getFullYear();
-
-        // Time
-        var { DateTime } = luxon;
-        var userLocalTime = luxon.DateTime.local();
-        var convertedTime = userLocalTime.toUTC().toFormat('HHmm');
-
-        console.log(convertedTime);
-
-        $('[hero-date]').text(`${month} ${day}, ${year}`);
-        $('[hero-time]').text(`${convertedTime}[ZULU]`);
-
-        // Mouse Coordinates
-        $(document).mousemove(function (event) {
-          $('[mouseX]').text(event.clientX);
-          $('[mouseY]').text(event.clientY);
-        });
-      });
-    },
-  });
-  let main;
-
-  // ---- CAPABILITIES
-  const navItems = document.querySelectorAll('.cap_navigation-item');
-  const anchors = $('.cap-anchor_box .cap-anchor')
-    .map(function () {
-      return '#' + $(this).attr('id');
-    })
-    .get();
-
-  const findCurrentAnchorIndex = () => {
-    for (let i = 0; i < navItems.length; i++) {
-      if (navItems[i].classList.contains('w--current')) {
-        return i;
-      }
-    }
-    return -1;
-  };
-
-  const scrollToAnchor = (id) => {
-    document.querySelector(id).scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const handleNavItemClick = (item, index, event) => {
-    if (mobile.matches) {
-      event.preventDefault();
-      event.stopPropagation();
-      navItems.forEach((item) => item.classList.remove('w--current'));
-      item.classList.add('w--current');
-      const slideIndex = index;
-      capSwiper.slideTo(slideIndex);
-    }
-  };
-
-  const mobile = window.matchMedia('(max-width: 991px)');
-  const desktop = window.matchMedia('(min-width: 992px)');
-  let capSwiper = null;
-
-  const swiperMode = () => {
-    const arrowPrev = $('.cap_slider-actions .slider-arrow');
-    arrowPrev.addClass('capabilities-arrow');
-
-    if (desktop.matches) {
-      if (capSwiper) {
-        capSwiper.destroy(true, true);
-        capSwiper = null;
-        $(navItems).removeClass('w--current');
-      }
-    } else if (mobile.matches) {
-      $(navItems).removeClass('w--current');
-      $(navItems).eq(0).addClass('w--current');
-      if (!capSwiper) {
-        capSwiper = new Swiper('.cap_content', {
-          slidesPerView: 1,
-          spaceBetween: 24,
-          speed: 250,
-          observer: true,
-          centeredSlides: true,
-          navigation: {
-            prevEl: '.slider-arrow.prev.capabilities-arrow',
-            nextEl: '.slider-arrow.next.capabilities-arrow',
-          },
-          on: {
-            slideChange: () => {
-              navItems.forEach((item, index) => {
-                if (index === capSwiper.activeIndex) {
-                  item.classList.add('w--current');
-                } else {
-                  item.classList.remove('w--current');
-                }
-              });
-            },
-          },
-        });
-      }
-    }
-  };
-
-  // Events
-  window.addEventListener('load', () => {
-    swiperMode();
-  });
-
-  window.addEventListener('resize', () => {
-    swiperMode();
-  });
-
-  navItems.forEach((item, index) => {
-    item.addEventListener('click', (event) => {
-      handleNavItemClick(item, index, event);
-    });
-  });
-
-  // Desktop Arrows Click
-  $('.cap_slider-actions.desktop .slider-arrow.prev').click(() => {
-    const currentAnchorIndex = findCurrentAnchorIndex();
-    if (currentAnchorIndex > 0) {
-      scrollToAnchor(anchors[currentAnchorIndex - 1]);
-    } else {
-      scrollToAnchor(anchors[anchors.length - 1]);
-    }
-  });
-
-  $('.cap_slider-actions.desktop .slider-arrow.next').click(() => {
-    const currentAnchorIndex = findCurrentAnchorIndex();
-    if (currentAnchorIndex < anchors.length - 1) {
-      scrollToAnchor(anchors[currentAnchorIndex + 1]);
-    } else {
-      scrollToAnchor(anchors[0]);
-    }
-  });
-
-  let arrowLeft = $('.w-icon-slider-left');
-  let arrowRight = $('.w-icon-slider-right');
-  let customArrows = $('.about__investor-arrow');
-
-  customArrows.on('click', function (element) {
-    getDirection(element);
-  });
-
-  function getDirection(element) {
-    customArrows.each(function () {
-      let directionID = $(this).attr('id');
-
-      if (directionID === 'link-left') {
-        if (arrowLeft.is(':hidden')) {
-          $(this).hide();
-        } else {
-          $(this).show();
-        }
-      }
-
-      if (directionID === 'link-right') {
-        if (arrowRight.is(':hidden')) {
-          $(this).hide();
-        } else {
-          $(this).show();
-        }
-      }
-    });
-
-    let clickedDirection = $(element).attr('id');
-    if (clickedDirection === 'link-left') {
-      arrowLeft.click();
-    }
-    if (clickedDirection === 'link-right') {
-      arrowRight.click();
-    }
+// Parts
+let avatarTl = gsap.timeline({ paused: true });
+avatarTl.fromTo(
+  avatar,
+  { opacity: 0, scale: 0.5 },
+  {
+    ...fastReveal,
+    scale: 1,
+    xPercent: -105,
+    duration: 0.5,
   }
-
-  getDirection();
+);
+// Front
+avatarTl.to(avatar, {
+  duration: 0.001,
+  onStart: () => avatar.css('z-index', 1),
+  onReverseComplete: () => avatar.css('z-index', 1),
+  onComplete: () => avatar.css('z-index', 5),
 });
+avatarTl.to(avatar, { xPercent: -50 });
+
+CustomBounce.create('boxBounce', {
+  strength: 0.25,
+  squash: 10,
+});
+CustomBounce.create('mainBounce', {
+  strength: 0.3,
+  squash: 0.3,
+});
+
+// MainTo Timeline
+let mainTo = gsap.timeline();
+
+mainTo
+  .fromTo(
+    orderedBoxes,
+    { opacity: 0, y: '-30em' },
+    { ...fastReveal, y: '0', stagger: boxStagger, ease: 'boxBounce', duration: boxDuration }
+  )
+  .add(function () {
+    if (!hasMainBoxAnimated) {
+      gsap.fromTo(
+        mainBox,
+        { opacity: 0, rotate: 8, y: '-30em' },
+        { ...fastReveal, y: '0', rotate: 0, ease: 'mainBounce', duration: 1 }
+      );
+      hasMainBoxAnimated = true; // Update the flag
+    }
+  }, '<0.2')
+  .to(
+    orderedBoxes,
+    {
+      yPercent: -50,
+      rotate: 8,
+      duration: boxDuration,
+      stagger: boxStagger,
+      ease: 'boxBounce-squash',
+    },
+    0
+  )
+  .to(orderedBoxes.eq(4), { rotate: -24, xPercent: -0.5 }, '-=0.3')
+  .call(() => {
+    avatarTl.play();
+  });
+
+// MainFrom
+let mainFrom = gsap.timeline({ paused: true });
+mainFrom.to(boxes.eq(0).add(boxes.eq(1)), {
+  x: '-15rem',
+  keyframes: { '50%': { opacity: 0 } },
+  stagger: 0.2,
+  duration: 0.5,
+});
+mainFrom.to(
+  boxes.eq(3).add(boxes.eq(4)),
+  {
+    x: '15rem',
+    keyframes: { '50%': { opacity: 0 } },
+    stagger: 0.2,
+    duration: 0.5,
+  },
+  '<'
+);
+mainFrom.to(
+  boxes.eq(2),
+  {
+    y: '10em',
+    keyframes: { '50%': { opacity: 0 } },
+    stagger: 0.2,
+    duration: 0.5,
+  },
+  '<'
+);
+
+// Function to check scroll position and play/reverse timeline
+function checkScrollAndAnimate() {
+  if (window.scrollY === 0) {
+    mainFrom.reverse();
+    avatarTl.play();
+  } else {
+    mainFrom.play();
+    avatarTl.reverse();
+  }
+}
+
+// Add scroll event listener
+window.addEventListener('scroll', checkScrollAndAnimate);

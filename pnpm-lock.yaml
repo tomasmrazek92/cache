@@ -18,7 +18,8 @@ specifiers:
   eslint-config-prettier: ^8.7.0
   eslint-plugin-prettier: ^4.2.1
   eslint-plugin-simple-import-sort: ^10.0.0
-  gsap: ^3.11.5
+  gsap: file:gsap-bonus.tgz
+  luxon: ^3.3.0
   prettier: ^2.8.4
   run: ^1.4.0
   swiper: ^9.1.1
@@ -27,6 +28,7 @@ specifiers:
 dependencies:
   '@finsweet/ts-utils': 0.39.0
   gsap: 3.11.5
+  luxon: 3.4.4
   run: 1.4.0
   swiper: 9.2.4
 
@@ -605,7 +607,7 @@ packages:
     resolution: {integrity: sha512-BbWLi4WRHGze4C8NV7U7yRevuBFiPkPZZyGa0rryanvh/9HPUFXTNBXsGQxJZJq7Ix7j4RXMYodP3s+OsqCErg==}
     deprecated: This is a stub types definition. gsap provides its own type definitions, so you do not need this installed.
     dependencies:
-      gsap: 3.11.5
+      gsap: 3.12.3
     dev: true
 
   /@types/is-ci/3.0.0:
@@ -1617,6 +1619,11 @@ packages:
 
   /gsap/3.11.5:
     resolution: {integrity: sha512-Q89nKCLgoX5xUjznh9LcaIUkz54k1voNucT1Rpf9SJNFIQznBwFqt5qUUQbeVInFyN/n18OUJkpeI6CNEDt74w==}
+    dev: false
+
+  /gsap/3.12.3:
+    resolution: {integrity: sha512-TySXTE+ABiAVa61W+h5wv2p5GkJT1Uj//4nWpK8EjmhcDqwH++35IvtbQlVVFj+rdcJdFCdCt0SKgb+SwdPq/A==}
+    dev: true
 
   /hard-rejection/2.1.0:
     resolution: {integrity: sha512-VIZB+ibDhx7ObhAe7OVtoEbuP4h/MuOTHJ+J8h/eBXotJYl0fBgR72xDFCKgIh22OJZIOVNxBMWuhAr10r8HdA==}
@@ -1989,6 +1996,11 @@ packages:
     dependencies:
       yallist: 4.0.0
     dev: true
+
+  /luxon/3.4.4:
+    resolution: {integrity: sha512-zobTr7akeGHnv7eBOXcRgMeCP6+uyYsczwmeRCauvpvaAltgNyTbLH/+VaEAPUeWBT+1GuNmz4wC/6jtQzbbVA==}
+    engines: {node: '>=12'}
+    dev: false
 
   /map-obj/1.0.1:
     resolution: {integrity: sha512-7N/q3lyZ+LVCp7PzuxrJr4KMbBE2hW7BT7YNia330OFxIf4d3r5zVpicP2650l7CPN6RM9zOJRl3NGpqSiw3Eg==}
