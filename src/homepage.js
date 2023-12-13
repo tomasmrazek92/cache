@@ -128,12 +128,6 @@ function updateDimensions() {
   let heroSection = $('.section_hp-hero');
   let heroHeading = heroSection.find('.hp-hero_heading');
   let followingSection = $('.hp-hero_visual-down');
-  let heroHeadingHeight = heroHeading.outerHeight();
-
-  var visualUpPaddingTop = parseInt($('.hp-hero_visual-up').css('padding-top'), 10);
-  $('.hp-hero_visual-trigger')
-    .eq(1)
-    .css('padding-top', `${visualUpPaddingTop + heroHeadingHeight}px`);
 
   let heroHeight = heroSection.outerHeight();
 
