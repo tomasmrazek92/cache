@@ -133,7 +133,6 @@ function updateDimensions() {
 
   let followingHeight = followingSection.outerHeight();
 
-  $('.hp-hero_wall').height(heroHeight + followingHeight);
   followingSection.css('margin-top', '-' + heroHeight + 'px');
 }
 // Initial call to set dimensions
@@ -141,3 +140,25 @@ updateDimensions();
 
 // Recalculate on resize
 $(window).resize(updateDimensions);
+
+// Function to handle the intersection change
+function handleIntersection(entries) {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      // Code to execute when the element is in view
+      $('.section_hp-hero').css('pointer-events', 'auto');
+    } else {
+      // Code to execute when the element is not in view
+      $('.section_hp-hero').css('pointer-events', 'none');
+    }
+  });
+}
+
+// Creating a new Intersection Observer instance
+const observer = new IntersectionObserver(handleIntersection);
+
+// Targeting the element to observe
+const target = document.getElementsByClassName('hp-hero_wall-trigger')[0];
+if (target) {
+  observer.observe(target);
+}
