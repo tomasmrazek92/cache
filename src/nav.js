@@ -2,7 +2,7 @@
 function checkNav() {
   var scroll = $(window).scrollTop();
 
-  if (scroll >= 100) {
+  if (scroll >= 200) {
     $('.nav_wrapper').addClass('sticky');
     setTimeout(() => {
       $('.nav_wrapper').css('top', 0);
