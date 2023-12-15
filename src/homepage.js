@@ -28,7 +28,6 @@ avatarTl.fromTo(
     duration: 0.5,
   }
 );
-// Front
 avatarTl.to(avatar, {
   duration: 0.001,
   onStart: () => avatar.css('z-index', 1),
@@ -46,7 +45,7 @@ CustomBounce.create('mainBounce', {
   squash: 0.3,
 });
 
-// MainTo Timeline
+// ---- Intro Animation
 let mainTo = gsap.timeline();
 
 mainTo
@@ -81,7 +80,7 @@ mainTo
     avatarTl.play();
   });
 
-// MainFrom
+// ---- Scroll Out Animation
 let mainFrom = gsap.timeline({ paused: true });
 mainFrom.to(boxes.eq(0).add(boxes.eq(1)), {
   x: '-15rem',
@@ -110,7 +109,7 @@ mainFrom.to(
   '<'
 );
 
-// Function to check scroll position and play/reverse timeline
+// Scroll Out / To Logic
 function checkScrollAndAnimate() {
   if (window.scrollY === 0) {
     mainFrom.reverse();
@@ -124,6 +123,7 @@ function checkScrollAndAnimate() {
 // Add scroll event listener
 window.addEventListener('scroll', checkScrollAndAnimate);
 
+// --- Overlap Animation
 function updateDimensions() {
   let heroSection = $('.section_hp-hero');
   let heroHeading = heroSection.find('.hp-hero_heading');
@@ -135,30 +135,128 @@ function updateDimensions() {
 
   followingSection.css('margin-top', '-' + heroHeight + 'px');
 }
+
 // Initial call to set dimensions
 updateDimensions();
 
 // Recalculate on resize
 $(window).resize(updateDimensions);
 
-// Function to handle the intersection change
-function handleIntersection(entries) {
-  entries.forEach((entry) => {
-    if (entry.isIntersecting) {
-      // Code to execute when the element is in view
-      $('.section_hp-hero').css('pointer-events', 'auto');
-    } else {
-      // Code to execute when the element is not in view
-      $('.section_hp-hero').css('pointer-events', 'none');
+// --- Pointer Hero
+$('.hp-hero_wall-trigger').each(function () {
+  // Function to handle the intersection change
+  function handlePointer(entries) {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        // Code to execute when the element is in view
+        $('.section_hp-hero').css('pointer-events', 'auto');
+      } else {
+        // Code to execute when the element is not in view
+        $('.section_hp-hero').css('pointer-events', 'none');
+      }
+    });
+  }
+
+  // Creating a new Intersection Observer instance
+  const observer = new IntersectionObserver(handlePointer);
+
+  // Targeting the element to observe
+  const target = $(this)[0];
+  if (target) {
+    observer.observe(target);
+  }
+});
+
+let isScrolling;
+let urls = ['AMZN dropped 55% in 2022', 'TSLA dropped 72% in 2022', 'NVDA dropped 65% in 2022'];
+
+let urlIndex = 0;
+let split;
+
+let parentContainer = document.querySelector('#hero-stocks');
+
+function typeNextUrl() {
+  if (urlIndex >= urls.length) {
+    urlIndex = 0; // Restart from the first URL
+  }
+
+  let url = urls[urlIndex++];
+
+  // Create a new container for each URL
+  let container = document.createElement('div');
+  container.textContent = url + '?';
+
+  // Append the new container to the parent container
+  parentContainer.innerHTML = '';
+  parentContainer.appendChild(container);
+
+  let split = new SplitType(container, { types: 'chars' });
+  let tl = gsap.timeline();
+
+  // Animate the characters
+  tl.fromTo(
+    $(split.chars),
+    {
+      display: 'none',
+    },
+    {
+      display: 'inline',
+      ease: 'power2',
+      stagger: 0.03,
     }
-  });
+  );
+
+  tl.to(
+    $(split.chars).toArray().reverse(),
+    {
+      display: 'none',
+      ease: 'power2',
+      stagger: 0.03,
+      onComplete: () => {
+        // Function to check if isScrolling is false
+        function checkScrolling() {
+          if (!isScrolling) {
+            // Remove the function to stop the loop
+            gsap.ticker.remove(checkScrolling);
+
+            // Call Next
+            gsap.delayedCall(0, typeNextUrl);
+          }
+        }
+
+        // Add the function to the ticker
+        gsap.ticker.add(checkScrolling);
+      },
+    },
+    '+=2'
+  );
 }
 
-// Creating a new Intersection Observer instance
-const observer = new IntersectionObserver(handleIntersection);
+typeNextUrl();
 
-// Targeting the element to observe
-const target = document.getElementsByClassName('hp-hero_wall-trigger')[0];
-if (target) {
-  observer.observe(target);
+// Scroll Fix
+let debounceTimer;
+
+// Function to be called after scrolling stops
+function hasStoppedScrolling() {
+  // No more scrolling
+  isScrolling = false;
 }
+
+// Listen for scroll events
+window.addEventListener(
+  'scroll',
+  function () {
+    // Scrolling is happening
+    if (!isScrolling) {
+      isScrolling = true;
+    }
+
+    // Clear the timeout if it's already been set.
+    clearTimeout(debounceTimer);
+
+    // Set a timeout to run after scrolling ends
+    debounceTimer = setTimeout(hasStoppedScrolling, 500);
+  },
+  false
+);
