@@ -2,6 +2,8 @@ import CustomBounce from './utils/CustomBounce';
 
 gsap.registerPlugin(CustomEase, CustomBounce);
 
+// ---- Hero Elems
+
 // Els
 let mainBox = $('.hp-hero_main-box');
 let avatar = $('.hp-hero_avatar');
@@ -260,3 +262,10 @@ window.addEventListener(
   },
   false
 );
+
+// --- Homepage Video
+$('.hp-videos_button').on('click', function () {
+  $(this).hide();
+  $(this).closest('.hp-videos').find('video')[0].play();
+  $(this).closest('.hp-videos').find('video').attr('controls', 'true');
+});

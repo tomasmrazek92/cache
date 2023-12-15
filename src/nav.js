@@ -1,15 +1,18 @@
 // Nav Reveal
 function checkNav() {
   var scroll = $(window).scrollTop();
+  let nav = $('.nav_wrapper');
 
-  if (scroll >= 200) {
-    $('.nav_wrapper').addClass('sticky');
-    setTimeout(() => {
-      $('.nav_wrapper').css('top', 0);
-    });
-  } else if (scroll === 0) {
-    $('.nav_wrapper').removeClass('sticky');
-    $('.nav_wrapper').attr('style', '');
+  if (typeof nav.attr('fixed-by-default') === 'undefined') {
+    if (scroll >= 200) {
+      nav.addClass('sticky');
+      setTimeout(() => {
+        $('.nav_wrapper').css('top', 0);
+      });
+    } else if (scroll === 0) {
+      nav.removeClass('sticky');
+      nav.attr('style', '');
+    }
   }
 }
 

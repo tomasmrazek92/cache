@@ -1,1 +1,1 @@
-"use strict";(()=>{function r(){var a=$(window).scrollTop();a>=200?($(".nav_wrapper").addClass("sticky"),setTimeout(()=>{$(".nav_wrapper").css("top",0)})):a===0&&($(".nav_wrapper").removeClass("sticky"),$(".nav_wrapper").attr("style",""))}$(window).scroll(r);r();})();
+"use strict";(()=>{function t(){var s=$(window).scrollTop();let e=$(".nav_wrapper");typeof e.attr("fixed-by-default")=="undefined"&&(s>=200?(e.addClass("sticky"),setTimeout(()=>{$(".nav_wrapper").css("top",0)})):s===0&&(e.removeClass("sticky"),e.attr("style","")))}$(window).scroll(t);t();})();
