@@ -186,7 +186,7 @@ function typeNextUrl() {
 
   // Create a new container for each URL
   let container = document.createElement('div');
-  container.textContent = url + '?';
+  container.textContent = url;
 
   // Append the new container to the parent container
   parentContainer.innerHTML = '';
@@ -204,7 +204,7 @@ function typeNextUrl() {
     {
       display: 'inline',
       ease: 'power2',
-      stagger: 0.03,
+      stagger: 0.08,
     }
   );
 
