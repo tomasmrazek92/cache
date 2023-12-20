@@ -1,7 +1,7 @@
 {
   "version": 3,
   "sources": ["../bin/live-reload.js", "../src/nav.js"],
-  "sourcesContent": ["new EventSource(`${SERVE_ORIGIN}/esbuild`).addEventListener('change', () => location.reload());\n", "// Nav Reveal\nfunction checkNav() {\n  var scroll = $(window).scrollTop();\n  let nav = $('.nav_wrapper');\n\n  if (typeof nav.attr('fixed-by-default') === 'undefined') {\n    if (scroll >= 200) {\n      nav.addClass('sticky');\n      setTimeout(() => {\n        $('.nav_wrapper').css('top', 0);\n      });\n    } else if (scroll === 0) {\n      nav.removeClass('sticky');\n      nav.attr('style', '');\n    }\n  }\n}\n\n$(window).scroll(checkNav);\ncheckNav();\n"],
+  "sourcesContent": ["new EventSource(`${SERVE_ORIGIN}/esbuild`).addEventListener('change', () => location.reload());\n", "// Nav Reveal\nfunction checkNav() {\n  var scroll = $(window).scrollTop();\n  let nav = $('.nav_wrapper');\n\n  if (typeof nav.attr('fixed-by-default') === 'undefined') {\n    if (scroll >= 250) {\n      nav.addClass('sticky');\n      setTimeout(() => {\n        $('.nav_wrapper').css('top', 0);\n      });\n    } else if (scroll === 0) {\n      nav.removeClass('sticky');\n      nav.attr('style', '');\n    }\n  }\n}\n\n$(window).scroll(checkNav);\ncheckNav();\n"],
   "mappings": ";;;AAAA,MAAI,YAAY,GAAG,iCAAsB,EAAE,iBAAiB,UAAU,MAAM,SAAS,OAAO,CAAC;;;ACC7F,WAAS,WAAW;AAClB,QAAI,SAAS,EAAE,MAAM,EAAE,UAAU;AACjC,QAAI,MAAM,EAAE,cAAc;AAE1B,QAAI,OAAO,IAAI,KAAK,kBAAkB,MAAM,aAAa;AACvD,UAAI,UAAU,KAAK;AACjB,YAAI,SAAS,QAAQ;AACrB,mBAAW,MAAM;AACf,YAAE,cAAc,EAAE,IAAI,OAAO,CAAC;AAAA,QAChC,CAAC;AAAA,MACH,WAAW,WAAW,GAAG;AACvB,YAAI,YAAY,QAAQ;AACxB,YAAI,KAAK,SAAS,EAAE;AAAA,MACtB;AAAA,IACF;AAAA,EACF;AAEA,IAAE,MAAM,EAAE,OAAO,QAAQ;AACzB,WAAS;",
   "names": []
 }

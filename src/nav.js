@@ -4,7 +4,7 @@ function checkNav() {
   let nav = $('.nav_wrapper');
 
   if (typeof nav.attr('fixed-by-default') === 'undefined') {
-    if (scroll >= 200) {
+    if (scroll >= 250) {
       nav.addClass('sticky');
       setTimeout(() => {
         $('.nav_wrapper').css('top', 0);

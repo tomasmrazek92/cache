@@ -5,6 +5,7 @@ gsap.registerPlugin(CustomEase, CustomBounce);
 // ---- Hero Elems
 
 // Els
+let heroVisual = $('.hp-hero_visual');
 let mainBox = $('.hp-hero_main-box');
 let avatar = $('.hp-hero_avatar');
 
@@ -18,25 +19,7 @@ let boxDuration = 0.7;
 let boxStagger = 0.15;
 let hasMainBoxAnimated = false;
 
-// Parts
-let avatarTl = gsap.timeline({ paused: true });
-avatarTl.fromTo(
-  avatar,
-  { opacity: 0, scale: 0.5 },
-  {
-    ...fastReveal,
-    scale: 1,
-    xPercent: -105,
-    duration: 0.5,
-  }
-);
-avatarTl.to(avatar, {
-  duration: 0.001,
-  onStart: () => avatar.css('z-index', 1),
-  onReverseComplete: () => avatar.css('z-index', 1),
-  onComplete: () => avatar.css('z-index', 5),
-});
-avatarTl.to(avatar, { xPercent: -50 });
+// Avatar Animation
 
 CustomBounce.create('boxBounce', {
   strength: 0.25,
@@ -48,9 +31,9 @@ CustomBounce.create('mainBounce', {
 });
 
 // ---- Intro Animation
-let mainTo = gsap.timeline();
+let introTl = gsap.timeline();
 
-mainTo
+introTl
   .fromTo(
     orderedBoxes,
     { opacity: 0, y: '-30em' },
@@ -77,20 +60,122 @@ mainTo
     },
     0
   )
-  .to(orderedBoxes.eq(4), { rotate: -24, xPercent: -0.5 }, '-=0.3')
-  .call(() => {
-    avatarTl.play();
+  .to(orderedBoxes.eq(4), { rotate: -24, xPercent: -0.5 }, '-=0.3');
+
+// ---- Main Animation
+// Label Text
+let activeIndex = 0;
+let stocks = ['AMZN dropped 55% in 2022', 'TSLA dropped 72% in 2022', 'NVDA dropped 65% in 2022'];
+let stocksLabel = ['amzn', 'tsla', 'nvda'];
+let splitPil;
+let splitLabel;
+
+// Functions
+function createAnimation(index, containerSelector, dataArray, splitVar) {
+  let parentContainer = document.querySelector(containerSelector);
+  let content = dataArray[index];
+  let container = document.createElement('div');
+  container.textContent = '$' + content;
+  parentContainer.innerHTML = '';
+  parentContainer.appendChild(container);
+
+  // Use the provided split variable
+  if (splitVar === 'pill') {
+    splitPil = new SplitType(container, { types: 'chars' });
+  } else if (splitVar === 'label') {
+    splitLabel = new SplitType(container, { types: 'chars' });
+  }
+  let tl = gsap.timeline();
+
+  // Animate characters appearing
+  tl.fromTo(
+    $(splitPil.chars),
+    { display: 'none' },
+    { display: 'inline', ease: 'power2', stagger: 0.08 }
+  );
+
+  return tl; // Return the timeline
+}
+
+function createAvatarAnimation() {
+  let avatarTl = gsap.timeline({
+    onReverseComplete: updateAvatar,
   });
 
+  avatarTl
+    .fromTo(
+      avatar,
+      { opacity: 0, scale: 0.5 },
+      { ...fastReveal, scale: 1, xPercent: -105, duration: 0.5 }
+    )
+    .to(avatar, {
+      duration: 0.001,
+      onStart: () => avatar.css('z-index', 1),
+      onReverseComplete: () => avatar.css('z-index', 1),
+      onComplete: () => avatar.css('z-index', 5),
+    })
+    .to(avatar, { xPercent: -50 });
+
+  return avatarTl; // Return the timeline
+}
+function removeStockAnimation(splitVar) {
+  // Animate characters disappearing
+  let tl = gsap.timeline();
+  tl.to($(splitVar.chars).toArray().reverse(), { display: 'none', ease: 'power2', stagger: 0.03 });
+  return tl;
+}
+function updateAvatar() {
+  let avatars = avatar.find('.image');
+  avatars.hide();
+  console.log('Avatar:', activeIndex);
+  avatars.eq(activeIndex).show();
+}
+function updateStockStyle(index) {
+  let tl = gsap.timeline();
+
+  tl.add(() => {
+    // Remove any existing stock label classes
+    stocksLabel.forEach((label) => {
+      heroVisual.removeClass(label);
+    });
+
+    // Add the new style class for the current index
+    let style = stocksLabel[index];
+    heroVisual.addClass(style);
+  });
+
+  return tl;
+}
+function setupAnimations() {
+  // Clear the timeline and add new animations
+  masterTimeline.clear();
+  masterTimeline.add(updateStockStyle(activeIndex));
+  masterTimeline.add(createAnimation(activeIndex, '#hero-stocks', stocks, 'pill'));
+  masterTimeline.add(createAnimation(activeIndex, '#label-stock', stocksLabel, 'label'), '<');
+  masterTimeline.add(createAvatarAnimation(), '<'); // Adjust timing as needed
+  // Increment activeIndex
+  activeIndex = (activeIndex + 1) % stocks.length;
+  masterTimeline.add(removeStockAnimation(splitPil), '+=1'); // Adjust timing as needed
+  masterTimeline.add(createAvatarAnimation().reverse(), '<'); // Adjust timing as needed
+}
+
+let masterTimeline = gsap.timeline({
+  repeat: -1,
+  onRepeat: setupAnimations,
+});
+
+// Start the first cycle
+setupAnimations();
+
 // ---- Scroll Out Animation
-let mainFrom = gsap.timeline({ paused: true });
-mainFrom.to(boxes.eq(0).add(boxes.eq(1)), {
+let introOut = gsap.timeline({ paused: true });
+introOut.to(boxes.eq(0).add(boxes.eq(1)), {
   x: '-15rem',
   keyframes: { '50%': { opacity: 0 } },
   stagger: 0.2,
   duration: 0.5,
 });
-mainFrom.to(
+introOut.to(
   boxes.eq(3).add(boxes.eq(4)),
   {
     x: '15rem',
@@ -100,7 +185,7 @@ mainFrom.to(
   },
   '<'
 );
-mainFrom.to(
+introOut.to(
   boxes.eq(2),
   {
     y: '10em',
@@ -111,13 +196,14 @@ mainFrom.to(
   '<'
 );
 
+/*
 // Scroll Out / To Logic
 function checkScrollAndAnimate() {
   if (window.scrollY === 0) {
-    mainFrom.reverse();
+    introOut.reverse();
     avatarTl.play();
   } else {
-    mainFrom.play();
+    introOut.play();
     avatarTl.reverse();
   }
 }
@@ -125,10 +211,12 @@ function checkScrollAndAnimate() {
 // Add scroll event listener
 window.addEventListener('scroll', checkScrollAndAnimate);
 
+*/
 // --- Overlap Animation
 function updateDimensions() {
   let heroSection = $('.section_hp-hero');
   let heroHeading = heroSection.find('.hp-hero_heading');
+
   let followingSection = $('.hp-hero_visual-down');
 
   let heroHeight = heroSection.outerHeight();
@@ -168,100 +256,6 @@ $('.hp-hero_wall-trigger').each(function () {
     observer.observe(target);
   }
 });
-
-let isScrolling;
-let urls = ['AMZN dropped 55% in 2022', 'TSLA dropped 72% in 2022', 'NVDA dropped 65% in 2022'];
-
-let urlIndex = 0;
-let split;
-
-let parentContainer = document.querySelector('#hero-stocks');
-
-function typeNextUrl() {
-  if (urlIndex >= urls.length) {
-    urlIndex = 0; // Restart from the first URL
-  }
-
-  let url = urls[urlIndex++];
-
-  // Create a new container for each URL
-  let container = document.createElement('div');
-  container.textContent = url;
-
-  // Append the new container to the parent container
-  parentContainer.innerHTML = '';
-  parentContainer.appendChild(container);
-
-  let split = new SplitType(container, { types: 'chars' });
-  let tl = gsap.timeline();
-
-  // Animate the characters
-  tl.fromTo(
-    $(split.chars),
-    {
-      display: 'none',
-    },
-    {
-      display: 'inline',
-      ease: 'power2',
-      stagger: 0.08,
-    }
-  );
-
-  tl.to(
-    $(split.chars).toArray().reverse(),
-    {
-      display: 'none',
-      ease: 'power2',
-      stagger: 0.03,
-      onComplete: () => {
-        // Function to check if isScrolling is false
-        function checkScrolling() {
-          if (!isScrolling) {
-            // Remove the function to stop the loop
-            gsap.ticker.remove(checkScrolling);
-
-            // Call Next
-            gsap.delayedCall(0, typeNextUrl);
-          }
-        }
-
-        // Add the function to the ticker
-        gsap.ticker.add(checkScrolling);
-      },
-    },
-    '+=2'
-  );
-}
-
-typeNextUrl();
-
-// Scroll Fix
-let debounceTimer;
-
-// Function to be called after scrolling stops
-function hasStoppedScrolling() {
-  // No more scrolling
-  isScrolling = false;
-}
-
-// Listen for scroll events
-window.addEventListener(
-  'scroll',
-  function () {
-    // Scrolling is happening
-    if (!isScrolling) {
-      isScrolling = true;
-    }
-
-    // Clear the timeout if it's already been set.
-    clearTimeout(debounceTimer);
-
-    // Set a timeout to run after scrolling ends
-    debounceTimer = setTimeout(hasStoppedScrolling, 500);
-  },
-  false
-);
 
 // --- Homepage Video
 $('.hp-videos_button').on('click', function () {
