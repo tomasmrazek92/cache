@@ -203,11 +203,11 @@ introOut.to(
 
 // Scroll Out / To Logic
 function checkScrollAndAnimate() {
-  let distance = $(window).width() < 991 ? 50 : 0;
-  if (window.scrollY <= distance) {
+  let distance = $(window).width() < 991 ? 15 : 1;
+  if (window.scrollY === 0) {
     masterTimeline.timeScale(1).progress(1).play();
     introOut.reverse();
-  } else {
+  } else if (window.scrollY >= distance) {
     $('#hero-stocks').html(`<div>${$('#hero-stocks').text()}</div>`);
     masterTimeline.timeScale(3).reverse();
     introOut.play();
