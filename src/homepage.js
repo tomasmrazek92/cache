@@ -71,7 +71,7 @@ let splitPil;
 let splitLabel;
 
 // Functions
-function createAnimation(index, containerSelector, dataArray, splitVar) {
+function typeStock(index, containerSelector, dataArray, splitVar) {
   let parentContainer = document.querySelector(containerSelector);
   let content = dataArray[index];
   let container = document.createElement('div');
@@ -97,17 +97,13 @@ function createAnimation(index, containerSelector, dataArray, splitVar) {
   return tl; // Return the timeline
 }
 
-function createAvatarAnimation() {
-  let avatarTl = gsap.timeline({
-    onReverseComplete: updateAvatar,
-  });
-
-  avatarTl
-    .fromTo(
-      avatar,
-      { opacity: 0, scale: 0.5 },
-      { ...fastReveal, scale: 1, xPercent: -105, duration: 0.5 }
-    )
+function moveAvatar() {
+  let tl = gsap.timeline();
+  tl.fromTo(
+    avatar,
+    { opacity: 0, scale: 0.5 },
+    { ...fastReveal, scale: 1, xPercent: -105, duration: 0.5 }
+  )
     .to(avatar, {
       duration: 0.001,
       onStart: () => avatar.css('z-index', 1),
@@ -115,6 +111,14 @@ function createAvatarAnimation() {
       onComplete: () => avatar.css('z-index', 5),
     })
     .to(avatar, { xPercent: -50 });
+  return tl;
+}
+function createAvatarAnimation() {
+  let avatarTl = gsap.timeline({
+    onReverseComplete: updateAvatar,
+  });
+
+  avatarTl.add(moveAvatar());
 
   return avatarTl; // Return the timeline
 }
@@ -150,8 +154,9 @@ function setupAnimations() {
   // Clear the timeline and add new animations
   masterTimeline.clear();
   masterTimeline.add(updateStockStyle(activeIndex));
-  masterTimeline.add(createAnimation(activeIndex, '#hero-stocks', stocks, 'pill'));
-  masterTimeline.add(createAnimation(activeIndex, '#label-stock', stocksLabel, 'label'), '<');
+  masterTimeline.add(typeStock(activeIndex, '#hero-stocks', stocks, 'pill'));
+  masterTimeline.add(typeStock(activeIndex, '#label-stock', stocksLabel, 'label'), '<');
+  masterTimeline.addLabel('Avatar');
   masterTimeline.add(createAvatarAnimation(), '<'); // Adjust timing as needed
   // Increment activeIndex
   activeIndex = (activeIndex + 1) % stocks.length;
@@ -196,32 +201,67 @@ introOut.to(
   '<'
 );
 
-/*
 // Scroll Out / To Logic
 function checkScrollAndAnimate() {
   if (window.scrollY === 0) {
+    masterTimeline.timeScale(1).progress(1).play();
     introOut.reverse();
-    avatarTl.play();
   } else {
+    $('#hero-stocks').html(`<div>${$('#hero-stocks').text()}</div>`);
+    masterTimeline.timeScale(3).reverse();
     introOut.play();
-    avatarTl.reverse();
   }
 }
 
 // Add scroll event listener
 window.addEventListener('scroll', checkScrollAndAnimate);
 
-*/
+// --- Profiles Animation
+let profilesTl = gsap.timeline({ paused: true });
+
+// Select all groups with IDs starting with "Avatars"
+profilesTl.from($('svg [id^="Avatars"]').get().reverse(), {
+  opacity: 0,
+  duration: 1,
+  stagger: {
+    each: 0.05,
+    onStart: function () {
+      // 'this' refers to the currently animated 'Avatars' element
+      const currentAvatarGroup = this.targets()[0];
+
+      // Select all 'Avatar' elements inside the current 'Avatars' group
+      const innerAvatars = $(currentAvatarGroup).find('[id^="Avatar"]');
+
+      // Animate the inner 'Avatar' elements
+      gsap.from(innerAvatars, {
+        scale: 0,
+        duration: 0.5,
+        stagger: 0.05,
+        transformOrigin: 'center',
+      });
+    },
+  },
+});
+
+function handleIntersect(entries, observer) {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      profilesTl.timeScale(2).reverse();
+    } else {
+      profilesTl.timeScale(1).play();
+    }
+  });
+}
+
+// Creating an observer
+const observer = new IntersectionObserver(handleIntersect, { threshold: 0.8 });
+observer.observe($('.hp-hero_wall-trigger')[0]);
+
 // --- Overlap Animation
 function updateDimensions() {
   let heroSection = $('.section_hp-hero');
-  let heroHeading = heroSection.find('.hp-hero_heading');
-
   let followingSection = $('.hp-hero_visual-down');
-
   let heroHeight = heroSection.outerHeight();
-
-  let followingHeight = followingSection.outerHeight();
 
   followingSection.css('margin-top', '-' + heroHeight + 'px');
 }
