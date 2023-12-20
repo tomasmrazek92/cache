@@ -203,7 +203,9 @@ introOut.to(
 
 // Scroll Out / To Logic
 function checkScrollAndAnimate() {
-  if (window.scrollY === 0) {
+  let distance = $(window).width() < 991 ? 50 : 0;
+  console.log(distance);
+  if (window.scrollY === distance) {
     masterTimeline.timeScale(1).progress(1).play();
     introOut.reverse();
   } else {
