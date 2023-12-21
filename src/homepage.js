@@ -31,7 +31,11 @@ CustomBounce.create('mainBounce', {
 });
 
 // ---- Intro Animation
-let introTl = gsap.timeline();
+let introTl = gsap.timeline({
+  onComplete: () => {
+    introOut.add(scrollOut());
+  },
+});
 
 introTl
   .fromTo(
@@ -173,35 +177,65 @@ let masterTimeline = gsap.timeline({
 setupAnimations();
 
 // ---- Scroll Out Animation
-let introOut = gsap.timeline({ paused: true });
-introOut.to(boxes.eq(0).add(boxes.eq(1)), {
-  x: '-15rem',
-  keyframes: { '50%': { opacity: 0 } },
-  stagger: 0.2,
-  duration: 0.5,
-});
-introOut.to(
-  boxes.eq(3).add(boxes.eq(4)),
-  {
-    x: '15rem',
-    keyframes: { '50%': { opacity: 0 } },
-    stagger: 0.2,
-    duration: 0.5,
-  },
-  '<'
-);
-introOut.to(
-  boxes.eq(2),
-  {
-    y: '10em',
-    keyframes: { '50%': { opacity: 0 } },
-    stagger: 0.2,
-    duration: 0.5,
-  },
-  '<'
-);
+function scrollOut() {
+  let introOut = gsap.timeline();
+
+  // Get the current 'x' positions of the elements
+  let B0X0 = gsap.getProperty(boxes.eq(0)[0], 'x');
+  let B1X1 = gsap.getProperty(boxes.eq(1)[0], 'x');
+
+  // Animate the elements
+  introOut.fromTo(
+    boxes.eq(0).add(boxes.eq(1)),
+    {
+      x: (index) => (index === 0 ? B0X0 : B1X1),
+      opacity: 1,
+    },
+    {
+      x: '-15rem',
+      keyframes: { '50%': { opacity: 0 } },
+      stagger: 0.2,
+      duration: 0.5,
+    }
+  );
+
+  let B3X0 = gsap.getProperty(boxes.eq(3)[0], 'x');
+  let B4X1 = gsap.getProperty(boxes.eq(4)[0], 'x');
+  introOut.fromTo(
+    boxes.eq(3).add(boxes.eq(4)),
+    {
+      x: (index) => (index === 0 ? B3X0 : B4X1),
+      opacity: 1,
+    },
+    {
+      x: '15rem',
+      keyframes: { '50%': { opacity: 0 } },
+      stagger: 0.2,
+      duration: 0.5,
+    },
+    '<'
+  );
+  introOut.fromTo(
+    boxes.eq(2),
+    {
+      y: gsap.getProperty(boxes.eq(2)[0], 'Y'),
+      opacity: 1,
+    },
+    {
+      y: '10em',
+      keyframes: { '50%': { opacity: 0 } },
+      stagger: 0.2,
+      duration: 0.5,
+    },
+    '<'
+  );
+
+  return introOut;
+}
 
 // Scroll Out / To Logic
+let introOut = gsap.timeline({ paused: true });
+
 function checkScrollAndAnimate() {
   let distance = $(window).width() < 991 ? 15 : 1;
   if (window.scrollY === 0) {
