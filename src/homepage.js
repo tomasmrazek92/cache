@@ -64,7 +64,7 @@ introTl
     },
     0
   )
-  .to(orderedBoxes.eq(4), { rotate: -24, xPercent: -0.5 }, '-=0.3');
+  .to(orderedBoxes.eq(4), { rotate: -46, yPercent: 66 }, '-=0.1');
 
 // ---- Main Animation
 // Label Text
@@ -146,10 +146,12 @@ function updateStockStyle(index) {
     stocksLabel.forEach((label) => {
       heroVisual.removeClass(label);
     });
+    heroVisual.removeClass('moves');
 
     // Add the new style class for the current index
     let style = stocksLabel[index];
     heroVisual.addClass(style);
+    heroVisual.addClass('moves');
   });
 
   return tl;
