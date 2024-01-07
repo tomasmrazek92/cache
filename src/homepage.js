@@ -64,7 +64,7 @@ introTl
     },
     0
   )
-  .to(orderedBoxes.eq(4), { rotate: -46, yPercent: 66 }, '-=0.1');
+  .to(orderedBoxes.eq(4), { rotate: -46, yPercent: 62 }, '-=0.1');
 
 // ---- Main Animation
 // Label Text
@@ -138,7 +138,7 @@ function updateAvatar() {
   console.log('Avatar:', activeIndex);
   avatars.eq(activeIndex).show();
 }
-function updateStockStyle(index) {
+function updateStockStyle(index, initCall) {
   let tl = gsap.timeline();
 
   tl.add(() => {
@@ -150,16 +150,39 @@ function updateStockStyle(index) {
 
     // Add the new style class for the current index
     let style = stocksLabel[index];
+
+    // Get the rotation values based on the index
+    let rotations = {
+      amzn: { rotate: -46, yPercent: 62, xPercent: 0 },
+      tsla: { rotate: -20, yPercent: 26.5, xPercent: 10 },
+      nvda: { rotate: -23, yPercent: 12, xPercent: 1 },
+    };
+    let rotationValues = rotations[stocksLabel[index]];
+
     heroVisual.addClass(style);
     heroVisual.addClass('moves');
+
+    if (!initCall) {
+      let tl = gsap.timeline();
+      tl.to(
+        orderedBoxes.eq(4),
+        {
+          rotate: rotationValues.rotate,
+          yPercent: rotationValues.yPercent,
+          xPercent: rotationValues.xPercent,
+          duration: 0.5,
+        },
+        '-=0.1'
+      );
+    }
   });
 
   return tl;
 }
-function setupAnimations() {
+function setupAnimations(initCall) {
   // Clear the timeline and add new animations
   masterTimeline.clear();
-  masterTimeline.add(updateStockStyle(activeIndex));
+  masterTimeline.add(updateStockStyle(activeIndex, initCall));
   masterTimeline.add(typeStock(activeIndex, '#hero-stocks', stocks, 'pill'));
   masterTimeline.add(typeStock(activeIndex, '#label-stock', stocksLabel, 'label'), '<');
   masterTimeline.addLabel('Avatar');
@@ -176,7 +199,7 @@ let masterTimeline = gsap.timeline({
 });
 
 // Start the first cycle
-setupAnimations();
+setupAnimations(true);
 
 // ---- Scroll Out Animation
 function scrollOut() {
@@ -243,10 +266,12 @@ function checkScrollAndAnimate() {
   if (window.scrollY === 0) {
     masterTimeline.timeScale(1).progress(1).play();
     introOut.reverse();
+    $('.scroll-indicator').fadeIn('fast');
   } else if (window.scrollY >= distance) {
     $('#hero-stocks').html(`<div>${$('#hero-stocks').text()}</div>`);
     masterTimeline.timeScale(3).reverse();
     introOut.play();
+    $('.scroll-indicator').fadeOut('fast');
   }
 }
 
@@ -340,3 +365,5 @@ $('.hp-videos_button').on('click', function () {
   $(this).closest('.hp-videos').find('video')[0].play();
   $(this).closest('.hp-videos').find('video').attr('controls', 'true');
 });
+
+// --- Smoother Scroll
