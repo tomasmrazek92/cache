@@ -362,6 +362,8 @@ $('.hp-hero_wall-trigger').each(function () {
 // --- Homepage Video
 $('.hp-videos_button').on('click', function () {
   $(this).hide();
+  $(this).closest('.hp-videos').find('.hp-videos_bg').hide();
+  $(this).closest('.hp-videos').find('.hp-videos_video').show();
   $(this).closest('.hp-videos').find('video')[0].play();
   $(this).closest('.hp-videos').find('video').attr('controls', 'true');
 });
