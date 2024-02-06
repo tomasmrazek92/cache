@@ -350,7 +350,9 @@ $('.hp-hero_wall-trigger').each(function () {
   }
 
   // Creating a new Intersection Observer instance
-  const observer = new IntersectionObserver(handlePointer);
+  const observer = new IntersectionObserver(handlePointer, {
+    rootMargin: '-95% 0px',
+  });
 
   // Targeting the element to observe
   const target = $(this)[0];
