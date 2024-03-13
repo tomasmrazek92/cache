@@ -1,18 +1,41 @@
-// Nav Reveal
+// #region Nav Disable
+let scrollPosition;
+let menuOpen;
+let menuTimeout;
+const disableScroll = () => {
+  clearTimeout(menuTimeout);
+  if (!menuOpen) {
+    menuTimeout = setTimeout(() => {
+      scrollPosition = $(window).scrollTop();
+      $('html, body').scrollTop(0).addClass('overflow-hidden');
+    }, 200);
+  } else {
+    $('html, body').scrollTop(scrollPosition).removeClass('overflow-hidden');
+  }
+  menuOpen = !menuOpen;
+};
+
+$('.nav__button').on('click', function () {
+  disableScroll();
+});
+
+// #region Nav Reveal
 let nav = $('.nav_wrapper');
 function checkNav() {
   var scroll = $(window).scrollTop();
   let nav = $('.nav_wrapper');
 
-  if (typeof nav.attr('fixed-by-default') === 'undefined') {
-    if (scroll >= 250) {
-      nav.addClass('sticky');
-      setTimeout(() => {
-        $('.nav_wrapper').css('top', 0);
-      });
-    } else if (scroll === 0) {
-      nav.removeClass('sticky');
-      nav.attr('style', '');
+  if (!menuOpen) {
+    if (typeof nav.attr('fixed-by-default') === 'undefined') {
+      if (scroll >= 250) {
+        nav.addClass('sticky');
+        setTimeout(() => {
+          $('.nav_wrapper').css('top', 0);
+        });
+      } else if (scroll === 0) {
+        nav.removeClass('sticky');
+        nav.attr('style', '');
+      }
     }
   }
 }
@@ -67,3 +90,5 @@ targetElements.forEach((targetElement) => {
     attributeFilter: ['class'],
   });
 });
+
+// #endregion
