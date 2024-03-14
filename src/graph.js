@@ -96,6 +96,7 @@ let bar2_2 = $('[data-bar=2-2]');
 
 let gain1 = $('[data-gain="1"]');
 let gain2Text = $('[data-gain="text-2"]');
+let gain2Sign = $('[data-gain=sign-2]');
 let gain2 = $('[data-gain="2"]');
 let invst1 = $('[data-investment="1"]');
 let invst2 = $('[data-investment="2"]');
@@ -146,8 +147,9 @@ const stats1 = () => {
 // Load 2
 const part2 = () => {
   let tl = gsap.timeline({});
-  tl.to(bar2_1, { maxHeight: '4em' });
-  tl.set(gain2Text, { text: 'Tax Drag: -$' }, '<');
+  tl.to(bar2_1, { maxHeight: '4.5em' });
+  tl.set(gain2Text, { text: 'Tax Drag:' }, '<');
+  tl.set(gain2Sign, { text: '-$' }, '<');
   tl.call(animateToActivePoint, [1], '<');
   tl.add(stats2(), '<');
   return tl;
@@ -168,7 +170,8 @@ const part3 = () => {
   tl.to(barWrap.eq(1), { height: '18em' }, '<');
   tl.to(bar1_1, { maxHeight: '12.5em' }, '<');
   tl.to(bar2_1, { maxHeight: '9em', background: greenHex }, '<');
-  tl.set(gain2Text, { text: 'Capital Gain: $' }, '<');
+  tl.set(gain2Text, { text: 'Capital Gain:' }, '<');
+  tl.set(gain2Sign, { text: '$' }, '<');
   tl.call(animateToActivePoint, [2], '<');
   tl.add(stats3(), '<');
 
@@ -178,6 +181,7 @@ const stats3 = () => {
   let tl = gsap.timeline();
   tl.call(animateCounter, [value1, values.value1[2]], '<');
   tl.call(animateCounter, [value2, values.value2[2]], '<');
+  tl.call(animateCounter, [gain1, values.gain1], '<');
   tl.call(animateCounter, [gain2, values.gain2], '<');
   return tl;
 };
@@ -187,7 +191,6 @@ let main = gsap.timeline({
   scrollTrigger: {
     trigger: $('[graph-section]'),
     start: 'top center',
-    markers: true,
   },
 });
 

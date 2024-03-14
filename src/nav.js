@@ -5,8 +5,8 @@ let menuTimeout;
 const disableScroll = () => {
   clearTimeout(menuTimeout);
   if (!menuOpen) {
+    scrollPosition = $(window).scrollTop();
     menuTimeout = setTimeout(() => {
-      scrollPosition = $(window).scrollTop();
       $('html, body').scrollTop(0).addClass('overflow-hidden');
     }, 200);
   } else {
@@ -15,9 +15,10 @@ const disableScroll = () => {
   menuOpen = !menuOpen;
 };
 
-$('.nav__button').on('click', function () {
-  disableScroll();
-});
+$('.nav_button').on('click', disableScroll);
+$('#mobile-menu-close').on('click', disableScroll);
+
+// #endregion
 
 // #region Nav Reveal
 let nav = $('.nav_wrapper');
@@ -92,3 +93,127 @@ targetElements.forEach((targetElement) => {
 });
 
 // #endregion
+
+const menuDelay = '0.3';
+const initializeMobileNav = ({
+  menuEl,
+  openEl,
+  closeEl,
+  backEl,
+  brandEl,
+  labelEl,
+  primaryMenuId,
+}) => {
+  let navigationMemory = [];
+
+  const navigationReset = () => {
+    navigationMemory = [primaryMenuId];
+    hideSubNav();
+  };
+
+  const navigationAdd = (item) => {
+    navigationMemory.push(item);
+    if (navigationMemory.length > 1) {
+      showSubNav();
+    }
+  };
+  const navigationPop = () => {
+    navigationMemory.pop();
+    if (navigationMemory.length === 1) {
+      hideSubNav();
+    }
+  };
+
+  const showSubNav = () => {
+    gsap.to([backEl, labelEl], { opacity: 1, duration: menuDelay });
+    gsap.to(brandEl, { opacity: 0, duration: menuDelay });
+    gsap.set(brandEl, { pointerEvents: 'none' });
+  };
+
+  const hideSubNav = () => {
+    gsap.to([backEl, labelEl], { opacity: 0, duration: menuDelay });
+    gsap.to(brandEl, { opacity: 1, duration: menuDelay });
+    gsap.set(brandEl, { pointerEvents: 'auto' });
+  };
+
+  const visibleNext = (current, next) => {
+    gsap.to(current, { x: '-100%', duration: menuDelay });
+    gsap.to(next, { x: '0%', duration: menuDelay });
+  };
+
+  const visibleBack = (current, prev) => {
+    gsap.to(current, { x: '100%', duration: menuDelay });
+    gsap.to(prev, { x: '0%', duration: menuDelay });
+  };
+
+  const openMenu = () => {
+    gsap.set(menuEl, { x: '0vw' });
+    const mainContent = document.querySelector(`[data-nav-id=${primaryMenuId}]`);
+
+    gsap.set(menuEl, { x: '0vw' });
+    gsap.to(mainContent, { x: 0, duration: '0.2' });
+    navigationReset();
+  };
+
+  const handleClickSubmenu = ({ target }) => {
+    console.log(target);
+    const targetSubNavId = target.getAttribute('data-target-nav-id');
+    const activeTarget = navigationMemory[navigationMemory.length - 1];
+
+    // Update Tittle
+    labelEl.textContent = target.textContent;
+
+    visibleNext(
+      document.querySelector(`[data-nav-id=${activeTarget}]`),
+      document.querySelector(`[data-nav-id=${targetSubNavId}]`)
+    );
+
+    navigationAdd(targetSubNavId);
+  };
+
+  // initialize clicks
+  document.querySelectorAll('[data-target-nav-id]').forEach((clickItem) => {
+    clickItem.addEventListener('click', handleClickSubmenu);
+  });
+
+  const closeMenu = () => {
+    gsap.set(menuEl, { x: '-100vw' });
+
+    // reset position to all submenus
+    document.querySelectorAll('[data-nav-id]').forEach((submenu) => {
+      submenu.style.setProperty('transform', 'translateX(100%)');
+    });
+    handleClickBack();
+    navigationReset();
+  };
+
+  const handleClickBack = () => {
+    const currentTarget = navigationMemory[navigationMemory.length - 1];
+    const prevTarget = navigationMemory[navigationMemory.length - 2];
+
+    if (currentTarget && prevTarget) {
+      visibleBack(
+        document.querySelector(`[data-nav-id=${currentTarget}]`),
+        document.querySelector(`[data-nav-id=${prevTarget}]`)
+      );
+
+      navigationPop();
+    }
+  };
+
+  openEl.addEventListener('click', openMenu);
+  closeEl.addEventListener('click', closeMenu);
+  backEl.addEventListener('click', handleClickBack);
+
+  console.log(navigationMemory);
+};
+
+initializeMobileNav({
+  menuEl: document.getElementById('mobile-menu'),
+  openEl: document.getElementById('mobile-menu-open'),
+  closeEl: document.getElementById('mobile-menu-close'),
+  backEl: document.getElementById('mobile-menu-back'),
+  brandEl: document.getElementById('mobile-menu-brand'),
+  labelEl: document.getElementById('mobile-menu-label'),
+  primaryMenuId: 'main',
+});
