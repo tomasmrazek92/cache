@@ -2,6 +2,7 @@ import CustomBounce from './utils/CustomBounce';
 
 gsap.registerPlugin(CustomEase, CustomBounce);
 
+// #region
 // ---- Hero Elems
 
 // Els
@@ -371,3 +372,58 @@ $('.hp-videos_button').on('click', function () {
 });
 
 // --- Smoother Scroll
+
+// #endregion
+
+// --- Swiper Testimonials
+
+function animateBar(index) {
+  let bar = $('.hp-featured_progress-bar');
+  bar.stop(true);
+  setTimeout(() => {
+    bar.css('width', '0%');
+    bar.eq(index).animate({ width: '100%' }, 6200);
+  }, 200);
+}
+
+var featured = new Swiper('.hp-featured_wrap', {
+  slidesPerView: 1,
+  allowTouchMove: false,
+});
+
+var logos = new Swiper('.hp-featured_wrap-logo', {
+  spaceBetween: 2,
+  speed: 1000,
+  autoplay: {
+    delay: 6000,
+    disableOnInteraction: false,
+    waitForTransition: false,
+  },
+  slideToClickedSlide: true,
+  breakpoints: {
+    0: {
+      slidesPerView: 'auto',
+      allowTouchMove: true,
+      threshold: 5,
+    },
+    768: {
+      slidesPerView: 1,
+      allowTouchMove: false,
+      threshold: 500,
+    },
+  },
+  on: {
+    init: function (swiper) {
+      animateBar(swiper.activeIndex);
+    },
+    slideChange: function (swiper) {
+      animateBar(swiper.activeIndex);
+    },
+  },
+  controller: {
+    control: featured, // add this line to control the featured Swiper
+  },
+});
+
+// Initialize mutual control
+logos.controller.control = featured;
