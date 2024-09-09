@@ -130,6 +130,10 @@ gsap.set(contentReveal, { opacity: 0 });
 // Load 1
 const part1 = () => {
   let tl = gsap.timeline({});
+  tl.call(() => {
+    $('.exc_label-2').removeClass('is-active');
+    $('.exc_label-3').removeClass('is-active');
+  });
   tl.fromTo(barWrap, { height: 0 }, { height: '13.3em' });
   tl.call(animateToActivePoint, [0], '<');
   tl.add(stats1(), '<');
@@ -147,6 +151,10 @@ const stats1 = () => {
 // Load 2
 const part2 = () => {
   let tl = gsap.timeline({});
+  tl.call(() => {
+    $('.exc_label-2').addClass('is-active');
+    $('.exc_label-3').removeClass('is-active');
+  });
   tl.to(bar2_1, { maxHeight: '4.5em' });
   tl.set(gain2Text, { text: 'Tax Drag:' }, '<');
   tl.set(gain2Sign, { text: '-$' }, '<');
@@ -166,6 +174,10 @@ const stats2 = () => {
 // Load 3
 const part3 = () => {
   let tl = gsap.timeline({});
+  tl.call(() => {
+    $('.exc_label-2').addClass('is-active');
+    $('.exc_label-3').addClass('is-active');
+  });
   tl.to(barWrap.eq(0), { height: '97%' });
   tl.to(barWrap.eq(1), { height: '18em' }, '<');
   tl.to(bar1_1, { maxHeight: '12.5em' }, '<');
