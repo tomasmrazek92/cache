@@ -1,4 +1,5 @@
 // Slides
+let menuOpen;
 const categoryMap = {};
 const currentSlideEl = $('.current-slide');
 let currentSlide;
@@ -9,7 +10,7 @@ let lastActiveCategory = null;
 // Links
 const sideList = $('.questions_toc_list');
 const sideItems = $('.questions_toc-item');
-const categoryItems = $('.questions_list-item');
+const categoryItems = $('.questions_toc-dropdown');
 
 // Content
 const content = $('.questions_block');
@@ -26,8 +27,7 @@ const swiper = new Swiper('.questions_inner-slider', {
     },
     afterInit: (swiper) => {
       trackSlides(swiper);
-      console.log(categoryMap);
-      updateCategory(0);
+      updateCategory();
       updateToc(0, swiper);
     },
     slideChange: (swiper) => {
@@ -70,7 +70,12 @@ function trackSlides(swiper) {
   const activeSlide = $(swiper.slides[swiper.activeIndex]);
 
   // Iterate through each category to find the active slide
-  Object.keys(categoryMap).forEach((category) => {
+  Object.keys(categoryMap).forEach((category, index) => {
+    // Get total slides for each category
+    $('[category-count]')
+      .eq(index)
+      .text(`(${$(categoryMap[index + 1]).length})`);
+
     // Find the index of the active slide in the current category
     const indexInCategory = categoryMap[category].indexOf(activeSlide[0]) || 0;
 
@@ -101,18 +106,13 @@ function updateCategory(index) {
   const activeClass = 'active';
   const activeLine = $('.questions_active-line');
 
-  // Get the currently active item
-  const currentActiveIndex = categoryItems.index($('.questions_list-item.active'));
-
   // Check if the current active index does not match the passed index
   // Remove the active class from all items and update
   categoryItems.removeClass(activeClass);
   categoryItems.eq(index).addClass(activeClass);
 
   // Find the newly active item and move the line there
-  const newActiveItem = categoryItems.eq(index);
-  const leftPosition = newActiveItem.position().left;
-  activeLine.css('left', leftPosition + 'px');
+  const newActiveItem = categoryItems.eq(index ?? 0);
 
   // Update the sidelinks
   sideList.hide();
@@ -120,7 +120,6 @@ function updateCategory(index) {
 
   // Update the responsive name
   $('[category-display]').text(newActiveItem.find('[category-name]').text());
-  $('[icon-display]').html(newActiveItem.find('[category-icon]').html());
 }
 function updateToc(index, swiperInstance) {
   const parentIndex = sideItems.eq(index).closest('ul').index();
@@ -128,6 +127,9 @@ function updateToc(index, swiperInstance) {
 
   // Existing code to map slide references
   const categoryIndex = findInnerIndex(categoryMap, index);
+  let dropdownLists = categoryItems.find('.questions_toc-mask');
+  dropdownLists.stop().animate('height', 0);
+  dropdownLists.eq(categoryIndex).stop().animate('height', 'auto');
   console.log(parentIndex);
   console.log(categoryIndex);
   const slideRef = categoryMap[parentIndex + 1][categoryIndex];
@@ -197,9 +199,9 @@ $('#content-close').on('click', function () {
   disableScroll();
 });
 
+var scrollPosition;
 const disableScroll = () => {
   if (!menuOpen) {
-    var scrollPosition;
     scrollPosition = $(window).scrollTop();
     $('html, body').scrollTop(0).addClass('overflow-hidden');
   } else {
