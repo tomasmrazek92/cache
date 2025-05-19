@@ -4,6 +4,9 @@ gsap.registerPlugin(CustomEase, CustomBounce);
 
 // #region
 // ---- Hero Elems
+let heroSection = $('.section_hp-hero');
+let followingSection = $('.hp-hero_visual-down');
+let heroTrigger = $('.hp-hero_wall-trigger');
 
 // Els
 let heroVisual = $('.hp-hero_visual');
@@ -11,8 +14,11 @@ let mainBox = $('.hp-hero_main-box');
 let avatar = $('.hp-hero_avatar');
 
 let boxes = $('.hp-hero_box');
+let floatingCards = $('.lp-floating');
 let order = [1, 4, 0, 3, 2];
 let orderedBoxes = $($.map(order, (index) => boxes[index]));
+
+let scrollIndicator = $('.scroll-indicator');
 
 // Vars
 let fastReveal = { keyframes: { '50%': { opacity: 1 } } };
@@ -65,6 +71,11 @@ introTl
     },
     0
   )
+  .fromTo(
+    floatingCards,
+    { scale: 0 },
+    { scale: 1, immediateRender: true, stagger: 0.2, ease: 'power4.inOut', duration: 1 }
+  )
   .to(orderedBoxes.eq(4), { rotate: -46, yPercent: 62 }, '-=0.1');
 
 // ---- Main Animation
@@ -78,6 +89,8 @@ let splitLabel;
 // Functions
 function typeStock(index, containerSelector, dataArray, splitVar) {
   let parentContainer = document.querySelector(containerSelector);
+  if (!parentContainer) return;
+  console.log(parentContainer);
   let content = dataArray[index];
   let container = document.createElement('div');
   container.textContent = '$' + content;
@@ -85,11 +98,7 @@ function typeStock(index, containerSelector, dataArray, splitVar) {
   parentContainer.appendChild(container);
 
   // Use the provided split variable
-  if (splitVar === 'pill') {
-    splitPil = new SplitType(container, { types: 'chars' });
-  } else if (splitVar === 'label') {
-    splitLabel = new SplitType(container, { types: 'chars' });
-  }
+  splitPil = new SplitType(container, { types: 'chars' });
   let tl = gsap.timeline();
 
   // Animate characters appearing
@@ -128,10 +137,16 @@ function createAvatarAnimation() {
   return avatarTl; // Return the timeline
 }
 function removeStockAnimation(splitVar) {
-  // Animate characters disappearing
-  let tl = gsap.timeline();
-  tl.to($(splitVar.chars).toArray().reverse(), { display: 'none', ease: 'power2', stagger: 0.03 });
-  return tl;
+  if (splitVar) {
+    // Animate characters disappearing
+    let tl = gsap.timeline();
+    tl.to($(splitVar.chars).toArray().reverse(), {
+      display: 'none',
+      ease: 'power2',
+      stagger: 0.03,
+    });
+    return tl;
+  }
 }
 function updateAvatar() {
   let avatars = avatar.find('.image');
@@ -267,12 +282,12 @@ function checkScrollAndAnimate() {
   if (window.scrollY === 0) {
     masterTimeline.timeScale(1).progress(1).play();
     introOut.reverse();
-    $('.scroll-indicator').fadeIn('fast');
+    scrollIndicator.fadeIn('fast');
   } else if (window.scrollY >= distance) {
     $('#hero-stocks').html(`<div>${$('#hero-stocks').text()}</div>`);
     masterTimeline.timeScale(3).reverse();
     introOut.play();
-    $('.scroll-indicator').fadeOut('fast');
+    scrollIndicator.fadeOut('fast');
   }
 }
 
@@ -318,12 +333,10 @@ function handleIntersect(entries, observer) {
 
 // Creating an observer
 const observer = new IntersectionObserver(handleIntersect, { threshold: 0.8 });
-observer.observe($('.hp-hero_wall-trigger')[0]);
+observer.observe(heroTrigger[0]);
 
 // --- Overlap Animation
 function updateDimensions() {
-  let heroSection = $('.section_hp-hero');
-  let followingSection = $('.hp-hero_visual-down');
   let heroHeight = heroSection.outerHeight();
 
   followingSection.css('margin-top', '-' + heroHeight + 'px');
@@ -336,7 +349,7 @@ updateDimensions();
 $(window).resize(updateDimensions);
 
 // --- Pointer Hero
-$('.hp-hero_wall-trigger').each(function () {
+heroTrigger.each(function () {
   // Function to handle the intersection change
   function handlePointer(entries) {
     entries.forEach((entry) => {
@@ -361,6 +374,39 @@ $('.hp-hero_wall-trigger').each(function () {
     observer.observe(target);
   }
 });
+
+// --- LP Text Animation
+function initLPtext() {
+  let h1 = $('[data-hero-text="1"]');
+  let h2 = $('[data-hero-text="2"]');
+
+  let h1Text = h1.text();
+  let h2Text = h2.text();
+
+  let tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: 'body',
+      start: 'top top',
+      end: () => `+=${document.querySelector('.lp-hero_spacer').offsetHeight}`,
+      scrub: 1,
+    },
+  });
+
+  tl.to(h1, {
+    opacity: 0,
+    onComplete: () => {
+      h1.text(h2Text);
+      h2.text(h1Text);
+    },
+  }).to(h1.add(h2), {
+    opacity: 1,
+    onReverseComplete: () => {
+      h1.text(h1Text);
+      h2.text(h2Text);
+    },
+  });
+}
+initLPtext();
 
 // --- Homepage Video
 $('.hp-videos_button').on('click', function () {
