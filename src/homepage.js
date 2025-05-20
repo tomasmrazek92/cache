@@ -9,7 +9,8 @@ let followingSection = $('.hp-hero_visual-down');
 let heroTrigger = $('.hp-hero_wall-trigger');
 
 // Els
-let heroVisual = $('.hp-hero_visual');
+let heroVisual = $('.hp-hero_visual').length ? $('.hp-hero_visual') : $('.lp-hero_visual');
+console.log(heroVisual);
 let mainBox = $('.hp-hero_main-box');
 let avatar = $('.hp-hero_avatar');
 
@@ -90,7 +91,6 @@ let splitLabel;
 function typeStock(index, containerSelector, dataArray, splitVar) {
   let parentContainer = document.querySelector(containerSelector);
   if (!parentContainer) return;
-  console.log(parentContainer);
   let content = dataArray[index];
   let container = document.createElement('div');
   container.textContent = '$' + content;
@@ -151,7 +151,6 @@ function removeStockAnimation(splitVar) {
 function updateAvatar() {
   let avatars = avatar.find('.image');
   avatars.hide();
-  console.log('Avatar:', activeIndex);
   avatars.eq(activeIndex).show();
 }
 function updateStockStyle(index, initCall) {
@@ -377,8 +376,10 @@ heroTrigger.each(function () {
 
 // --- LP Text Animation
 function initLPtext() {
+  let visualMask = $('.hp-hero_visual-mask.cc-blue');
   let h1 = $('[data-hero-text="1"]');
   let h2 = $('[data-hero-text="2"]');
+  let visual = $('.lp-hero_visual');
 
   let h1Text = h1.text();
   let h2Text = h2.text();
@@ -405,6 +406,16 @@ function initLPtext() {
       h2.text(h2Text);
     },
   });
+
+  tl.to(
+    visual,
+    {
+      scale: '0.85',
+      duration: 1,
+    },
+    0
+  );
+  tl.to(visualMask, { backgroundColor: '#243B59' });
 }
 initLPtext();
 
