@@ -381,9 +381,6 @@ function initLPtext() {
   let h2 = $('[data-hero-text="2"]');
   let visual = $('.lp-hero_visual');
 
-  let h1Text = h1.text();
-  let h2Text = h2.text();
-
   let tl = gsap.timeline({
     scrollTrigger: {
       trigger: 'body',
@@ -396,26 +393,41 @@ function initLPtext() {
   tl.to(h1, {
     opacity: 0,
     onComplete: () => {
-      h1.text(h2Text);
-      h2.text(h1Text);
+      h1.attr('default-text', h1.text());
+      h1.text(h1.attr('data-text-2'));
     },
-  }).to(h1.add(h2), {
-    opacity: 1,
-    onReverseComplete: () => {
-      h1.text(h1Text);
-      h2.text(h2Text);
-    },
-  });
+  })
+    .to(h1, {
+      opacity: 1,
+      onReverseComplete: () => {
+        h1.text(h1.attr('default-text'));
+      },
+    })
+    .to(h1, {
+      opacity: 0,
+      onComplete: () => {
+        h1.text(h2.text());
+        h2.text(h1.attr('data-text-2'));
+      },
+    })
+    .to('.hp-hero_heading.cc-lp', { maxWidth: '80rem' })
+    .to(h1.add(h2), {
+      opacity: 1,
+      onReverseComplete: () => {
+        h2.text(h1.text());
+        h1.text(h1.attr('data-text-2'));
+      },
+    });
 
   tl.to(
     visual,
     {
-      scale: '0.85',
+      fontSize: '0.5rem',
       duration: 1,
     },
     0
   );
-  tl.to(visualMask, { backgroundColor: '#243B59' });
+  tl.to(visualMask, { backgroundColor: '#243B59', duration: 1 }, 0);
 }
 initLPtext();
 
