@@ -391,34 +391,15 @@ function initLPtext() {
   });
 
   tl.to(h1, {
-    opacity: 0,
-    onComplete: () => {
-      h1.attr('default-text', h1.text());
-      h1.text(h1.attr('data-text-2'));
-    },
-  })
-    .to(h1, {
-      opacity: 1,
-      onReverseComplete: () => {
-        h1.text(h1.attr('default-text'));
-      },
-    })
-    .to(h1, {
-      opacity: 0,
-      onComplete: () => {
-        h1.text(h2.text());
-        h2.text(h1.attr('data-text-2'));
-      },
-    })
-    .to('.hp-hero_heading.cc-lp', { maxWidth: '80rem' })
-    .to(h1.add(h2), {
-      opacity: 1,
-      onReverseComplete: () => {
-        h2.text(h1.text());
-        h1.text(h1.attr('data-text-2'));
-      },
-    });
-
+    scale: 0.5,
+    color: '#D0AF76',
+  });
+  tl.to('[data-hero-text-wrap]', {
+    height: 'auto',
+  });
+  tl.to(h2, {
+    opacity: 1,
+  });
   tl.to(
     visual,
     {
