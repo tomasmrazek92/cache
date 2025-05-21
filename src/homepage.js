@@ -385,7 +385,7 @@ function initLPtext() {
     scrollTrigger: {
       trigger: 'body',
       start: 'top top',
-      end: () => `+=${document.querySelector('.lp-hero_spacer').offsetHeight}`,
+      end: () => `+=${document.querySelector('.lp-hero_spacer').offsetHeight * 0.8}`,
       scrub: 1,
     },
   });
