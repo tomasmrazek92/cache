@@ -10,7 +10,7 @@ let lastActiveCategory = null;
 // Links
 const sideList = $('.questions_toc_list');
 const sideItems = $('.questions_toc-item');
-const categoryItems = $('.questions_toc-dropdown');
+const categoryItems = $('.questions_toc-dropdown-trigger');
 
 // Content
 const content = $('.questions_block');
@@ -109,7 +109,7 @@ function updateCategory(index) {
   // Check if the current active index does not match the passed index
   // Remove the active class from all items and update
   categoryItems.removeClass(activeClass);
-  categoryItems.eq(index).addClass(activeClass);
+  categoryItems.closest(".questions_toc-dropdown").eq(index).addClass(activeClass);
 
   // Find the newly active item and move the line there
   const newActiveItem = categoryItems.eq(index ?? 0);
@@ -125,19 +125,18 @@ function updateToc(index, swiperInstance) {
   const parentIndex = sideItems.eq(index).closest('ul').index();
   const activeClass = 'active';
 
+  console.log("call")
+
   // Existing code to map slide references
   const categoryIndex = findInnerIndex(categoryMap, index);
   let dropdownLists = categoryItems.find('.questions_toc-mask');
   dropdownLists.stop().animate('height', 0);
   dropdownLists.eq(categoryIndex).stop().animate('height', 'auto');
-  console.log(parentIndex);
-  console.log(categoryIndex);
+  console.log("Parent: " + parentIndex);
+  console.log("Category: " + categoryIndex);
   const slideRef = categoryMap[parentIndex + 1][categoryIndex];
   const slideIndex = slideRef ? $(slideRef).index() : 0;
 
-  if (swiperInstance) {
-    swiperInstance.slideTo(slideIndex);
-  }
 
   // Existing code to update active state
   sideItems.removeClass(activeClass);
@@ -170,12 +169,14 @@ function findInnerIndex(obj, targetIndex) {
 
 // Links
 sideItems.on('click', function () {
-  updateToc(sideItems.index($(this)), swiper);
+  if (swiper) {
+    swiper.slideTo(sideItems.index($(this)));
+  }
 });
 
 categoryItems.on('click', function () {
   // Base
-  const index = $(this).index();
+  const index = $(this).closest(".questions_toc-dropdown").index();
   updateCategory(index);
 
   const slideRef = categoryMap[index + 1][0];

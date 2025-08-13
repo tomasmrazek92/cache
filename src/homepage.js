@@ -377,6 +377,8 @@ heroTrigger.each(function () {
 // --- LP Text Animation
 function initLPtext() {
   let visualMask = $('.hp-hero_visual-mask.cc-blue');
+
+  if (!visualMask.length) return;
   let h1 = $('[data-hero-text="1"]');
   let h2 = $('[data-hero-text="2"]');
   let visual = $('.lp-hero_visual');
