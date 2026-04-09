@@ -25,17 +25,28 @@ let nav = $('.nav_wrapper');
 function checkNav() {
   var scroll = $(window).scrollTop();
   let nav = $('.nav_wrapper');
+  let subnav = $('.subnav_wrapper');
 
   if (!menuOpen) {
     if (typeof nav.attr('fixed-by-default') === 'undefined') {
       if (scroll >= 250) {
         nav.addClass('sticky');
+        if (subnav.length) {
+          subnav.addClass('sticky');
+        }
         setTimeout(() => {
           $('.nav_wrapper').css('top', 0);
         });
+        if (subnav.length) {
+          setTimeout(() => {
+            subnav.css('top', 0);
+          });
+        }
       } else if (scroll === 0) {
         nav.removeClass('sticky');
+        subnav.removeClass('sticky');
         nav.attr('style', '');
+        subnav.attr('style', '');
       }
     }
   }
