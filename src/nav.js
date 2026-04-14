@@ -29,24 +29,31 @@ function checkNav() {
 
   if (!menuOpen) {
     if (typeof nav.attr('fixed-by-default') === 'undefined') {
-      if (scroll >= 250) {
-        nav.addClass('sticky');
-        if (subnav.length) {
+      if (subnav.length) {
+        // When subnav exists, only make subnav sticky
+        if (scroll >= 250) {
           subnav.addClass('sticky');
-        }
-        setTimeout(() => {
-          $('.nav_wrapper').css('top', 0);
-        });
-        if (subnav.length) {
           setTimeout(() => {
             subnav.css('top', 0);
           });
         }
-      } else if (scroll === 0) {
-        nav.removeClass('sticky');
-        subnav.removeClass('sticky');
-        nav.attr('style', '');
-        subnav.attr('style', '');
+
+        const navTop = nav[0].getBoundingClientRect().top;
+        if (navTop >= 0) {
+          subnav.removeClass('sticky');
+          subnav.attr('style', '');
+        }
+      } else {
+        // No subnav — original nav sticky behavior
+        if (scroll >= 250) {
+          nav.addClass('sticky');
+          setTimeout(() => {
+            nav.css('top', 0);
+          });
+        } else if (scroll === 0) {
+          nav.removeClass('sticky');
+          nav.attr('style', '');
+        }
       }
     }
   }
