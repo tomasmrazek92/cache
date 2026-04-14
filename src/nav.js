@@ -105,6 +105,37 @@ targetElements.forEach((targetElement) => {
 
 // #endregion
 
+// #region Subnav Active Scroll
+const subnavWrapper = document.querySelector('.subnav_wrapper');
+if (subnavWrapper) {
+  const subnavLinks = subnavWrapper.querySelectorAll('.subnav_link');
+
+  const scrollToActiveLink = (link) => {
+    const wrapperRect = subnavWrapper.getBoundingClientRect();
+    const linkRect = link.getBoundingClientRect();
+    const offsetLeft = linkRect.left - wrapperRect.left + subnavWrapper.scrollLeft;
+    const scrollPos = offsetLeft - wrapperRect.width / 2 + linkRect.width / 2;
+    subnavWrapper.scrollTo({ left: scrollPos, behavior: 'smooth' });
+  };
+
+  const subnavObserver = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.target.classList.contains('w--current')) {
+        scrollToActiveLink(mutation.target);
+      }
+    });
+  });
+
+  subnavLinks.forEach((link) => {
+    subnavObserver.observe(link, { attributes: true, attributeFilter: ['class'] });
+    // Scroll to initially active link
+    if (link.classList.contains('w--current')) {
+      scrollToActiveLink(link);
+    }
+  });
+}
+// #endregion
+
 const menuDelay = '0.3';
 const initializeMobileNav = ({
   menuEl,
